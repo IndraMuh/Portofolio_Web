@@ -1,5 +1,6 @@
 "use client";
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useRef } from "react";
 import Link from "next/link"; 
 import { Github, Linkedin, Mail, Smartphone, Layout, Send, ArrowUpRight, Instagram, Palette } from "lucide-react";
 
@@ -29,6 +30,10 @@ export default function Home() {
     "Laravel 12", "PHP", "Blade", "Flutter", "MySQL", "GitHub", "Next.js", "Tailwind CSS", "Figma", "UI/UX Design", "Graphic Design"
   ];
 
+  // Efek Parallax untuk Background Decor
+  const { scrollY } = useScroll();
+  const bgY = useTransform(scrollY, [0, 1000], [0, 200]);
+
   const containerVars = {
     hidden: { opacity: 0 },
     visible: { opacity: 1, transition: { staggerChildren: 0.15 } }
@@ -42,14 +47,14 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-[#030712] text-slate-300 selection:bg-blue-500/30 overflow-x-hidden">
       
-      {/* Background Decor - Diperkuat agar efek Glass terlihat */}
-      <div className="fixed top-0 left-0 w-full h-full overflow-hidden -z-10">
+      {/* Background Decor dengan efek parallax halus */}
+      <motion.div style={{ y: bgY }} className="fixed top-0 left-0 w-full h-full overflow-hidden -z-10">
         <div className="absolute top-[10%] left-[10%] w-[30%] h-[30%] rounded-full bg-blue-600/20 blur-[120px]" />
         <div className="absolute bottom-[10%] right-[10%] w-[35%] h-[35%] rounded-full bg-purple-600/20 blur-[120px]" />
         <div className="absolute top-[40%] left-[40%] w-[20%] h-[20%] rounded-full bg-indigo-600/15 blur-[100px]" />
-      </div>
+      </motion.div>
 
-      {/* 1. NAVBAR - Glass Effect */}
+      {/* 1. NAVBAR */}
       <nav className="fixed top-0 w-full z-50 border-b border-white/10 bg-white/5 backdrop-blur-xl">
         <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
           <motion.span 
@@ -57,7 +62,7 @@ export default function Home() {
             animate={{ x: 0, opacity: 1 }}
             className="font-bold text-white tracking-tighter text-xl cursor-default"
           >
-          
+            IM.
           </motion.span>
           <motion.div 
             initial={{ x: 20, opacity: 0 }}
@@ -76,7 +81,7 @@ export default function Home() {
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
         >
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/10 bg-white/5 backdrop-blur-md text-blue-400 text-[10px] font-bold uppercase tracking-widest mb-8">
             <span className="relative flex h-2 w-2">
@@ -107,34 +112,16 @@ export default function Home() {
             >
               View My Work <ArrowUpRight size={20}/>
             </motion.a>
-            <div className="flex items-center gap-3 md:gap-4 px-2">
-              {[
-                { icon: <Linkedin size={20}/>, href: "https://www.linkedin.com/in/indra-muhammad-75a541371/" },
-                { icon: <Instagram size={20}/>, href: "https://www.instagram.com/_indramhmd/" },
-                { icon: <Github size={20}/>, href: "https://github.com/IndraMuh" },
-                { icon: <Mail size={20}/>, href: "mailto:indramuh.mf@gmail.com" }
-              ].map((social, i) => (
-                <motion.a 
-                  key={i}
-                  whileHover={{ y: -3, backgroundColor: "rgba(255,255,255,0.1)" }} 
-                  href={social.href} 
-                  target="_blank" 
-                  className="p-3 rounded-xl bg-white/5 border border-white/10 backdrop-blur-md text-slate-400 hover:text-white transition-all"
-                >
-                  {social.icon}
-                </motion.a>
-              ))}
-            </div>
           </div>
         </motion.div>
       </section>
 
-      {/* 3. SKILLS SECTION - Glassy Container */}
+      {/* 3. SKILLS SECTION */}
       <section className="max-w-5xl mx-auto py-20 px-6">
         <motion.div 
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true }}
+          viewport={{ once: true, margin: "-100px" }}
           variants={containerVars}
           className="p-8 md:p-12 rounded-[2.5rem] bg-white/[0.03] border border-white/10 backdrop-blur-xl shadow-2xl"
         >
@@ -153,62 +140,74 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* 4. PROJECTS SECTION */}
+      {/* 4. PROJECTS SECTION - Dengan Efek Ketarik (Parallax) */}
       <section id="projects" className="max-w-5xl mx-auto py-24 px-6">
         <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tight mb-16">Selected Works</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-          {projects.map((project, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              whileHover={{ y: -10 }}
-              className="relative group"
-            >
-              <div className="h-full p-8 md:p-10 rounded-[2.5rem] bg-white/[0.03] border border-white/10 backdrop-blur-2xl flex flex-col min-h-[380px] shadow-2xl transition-all group-hover:bg-white/[0.06] group-hover:border-white/20">
-                <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${project.color} backdrop-blur-md mb-8 flex items-center justify-center text-white border border-white/20 shadow-lg`}>
-                  {project.title.includes("Mobile") ? <Smartphone size={28} /> : project.title.includes("Design") ? <Palette size={28} /> : <Layout size={28} />}
+          {projects.map((project, i) => {
+            // Logika Parallax untuk setiap card
+            const cardRef = useRef(null);
+            const { scrollYProgress } = useScroll({
+              target: cardRef,
+              offset: ["start end", "end start"]
+            });
+            // Card akan bergerak sedikit lebih lambat dari scroll (efek mengambang)
+            const y = useTransform(scrollYProgress, [0, 1], [0, i % 2 === 0 ? -50 : -100]);
+
+            return (
+              <motion.div
+                ref={cardRef}
+                key={i}
+                style={{ y }}
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                className="relative group"
+              >
+                <div className="h-full p-8 md:p-10 rounded-[2.5rem] bg-white/[0.03] border border-white/10 backdrop-blur-2xl flex flex-col min-h-[380px] shadow-2xl transition-all group-hover:bg-white/[0.06] group-hover:border-white/20">
+                  <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${project.color} backdrop-blur-md mb-8 flex items-center justify-center text-white border border-white/20 shadow-lg`}>
+                    {project.title.includes("Mobile") ? <Smartphone size={28} /> : project.title.includes("Design") ? <Palette size={28} /> : <Layout size={28} />}
+                  </div>
+                  <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-blue-400 transition-colors">{project.title}</h3>
+                  <p className="text-slate-400 text-base leading-relaxed flex-1">{project.desc}</p>
+                  <div className="flex flex-wrap gap-2 pt-6 border-t border-white/10">
+                    {project.tech.map((t, idx) => (
+                      <span key={idx} className="text-[10px] uppercase tracking-widest font-bold text-slate-500">
+                        {t}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-blue-400 transition-colors">{project.title}</h3>
-                <p className="text-slate-400 text-base leading-relaxed flex-1">{project.desc}</p>
-                <div className="flex flex-wrap gap-2 pt-6 border-t border-white/10">
-                  {project.tech.map((t, idx) => (
-                    <span key={idx} className="text-[10px] uppercase tracking-widest font-bold text-slate-500">
-                      {t}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            );
+          })}
         </div>
       </section>
 
-      {/* 5. CONTACT SECTION - Solid Glass */}
+      {/* 5. CONTACT SECTION */}
       <section id="contact" className="max-w-5xl mx-auto py-32 px-6">
         <motion.div 
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
           className="relative p-12 md:p-24 rounded-[3rem] bg-blue-600/20 border border-white/20 backdrop-blur-3xl overflow-hidden text-center group"
         >
-          <div className="absolute -top-24 -right-24 w-64 h-64 bg-blue-500/20 rounded-full blur-3xl group-hover:bg-blue-500/40 transition-colors duration-700"></div>
           <h2 className="text-4xl md:text-6xl font-bold text-white mb-8 relative z-10 tracking-tighter">
             Punya ide hebat? <br /> Mari berkolaborasi.
           </h2>
-          <p className="text-blue-200/80 mb-10 relative z-10">Hubungi saya di indramuh.mf@gmail.com</p>
-          <a href="mailto:indramuh.mf@gmail.com" className="relative z-10 inline-flex items-center gap-3 px-10 py-5 bg-white/10 backdrop-blur-md text-white border border-white/20 font-extrabold rounded-2xl hover:bg-white hover:text-blue-700 transition-all hover:-translate-y-1">
+          <a href="mailto:indramuh.mf@gmail.com" className="relative z-10 inline-flex items-center gap-3 px-10 py-5 bg-white/10 backdrop-blur-md text-white border border-white/20 font-extrabold rounded-2xl hover:bg-white hover:text-blue-700 transition-all">
             Kirim Email <Send size={20}/>
           </a>
         </motion.div>
       </section>
 
       {/* FOOTER */}
-      <footer className="max-w-5xl mx-auto py-12 px-6 flex flex-col md:flex-row justify-between items-center gap-6 border-t border-white/10 text-slate-500">
+      <footer className="max-w-5xl mx-auto py-12 px-6 border-t border-white/10 text-slate-500 flex flex-col md:flex-row justify-between items-center gap-6">
         <p className="text-sm font-medium">© 2026 Indra Muh. Mobile & Web Developer</p>
         <div className="flex gap-6 text-sm font-bold uppercase tracking-widest">
           <a href="https://github.com/IndraMuh" target="_blank" className="hover:text-blue-400 transition">GitHub</a>
           <a href="https://www.linkedin.com/in/indra-muhammad-75a541371/" target="_blank" className="hover:text-blue-400 transition">LinkedIn</a>
-          <a href="https://www.instagram.com/_indramhmd/" target="_blank" className="hover:text-blue-400 transition">Instagram</a>
         </div>
       </footer>
     </main>
